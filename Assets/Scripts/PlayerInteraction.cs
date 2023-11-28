@@ -8,6 +8,7 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private LayerMask _doorLayer;
     [SerializeField] private LayerMask _interactableLayer;
     [SerializeField] private Transform _playerHand;
+    [SerializeField] private Vector3 _throwForce;
     [SerializeField] private Transform _interactableInventory;
     
     private Camera _camera;
@@ -51,11 +52,17 @@ public class PlayerInteraction : MonoBehaviour
                 _item = null;
             }
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            DropItem();
+        }
     }
 
     private void TakeItemInHand(RaycastHit hitInfo)
     {
         DropItem();
+        
         _isItemInHand = true;
         _itemInHandInfo = hitInfo;
         
@@ -73,6 +80,12 @@ public class PlayerInteraction : MonoBehaviour
         {
             _itemInHandInfo.rigidbody.isKinematic = false;
             _itemInHandInfo.transform.SetParent(_interactableInventory, true);
+            _isItemInHand = false;
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                _itemInHandInfo.rigidbody.AddRelativeForce(_throwForce);
+            }
         }
     }
 }
