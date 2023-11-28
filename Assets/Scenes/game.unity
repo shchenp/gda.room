@@ -18920,7 +18920,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   _playerHand: {fileID: 504122879}
-  _throwForce: {x: 0, y: 0, z: 300}
+  _throwForce: {x: 0, y: 20, z: 300}
   _interactableInventory: {fileID: 712852286}
 --- !u!1001 &1848767449
 PrefabInstance:
