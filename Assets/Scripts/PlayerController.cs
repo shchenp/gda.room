@@ -55,13 +55,19 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            DropItem();
+            if (_isItemInHand)
+            {
+                ThrowItem();   
+            }
         }
     }
 
     private void TakeItemInHand(RaycastHit hitInfo)
     {
-        DropItem();
+        if (_isItemInHand)
+        {
+            DropItem();
+        }
         
         _isItemInHand = true;
         _itemInHandInfo = hitInfo;
@@ -76,16 +82,15 @@ public class PlayerController : MonoBehaviour
 
     private void DropItem()
     {
-        if (_isItemInHand)
-        {
             _itemInHandInfo.rigidbody.isKinematic = false;
             _itemInHandInfo.transform.SetParent(_interactableInventory, true);
             _isItemInHand = false;
+    }
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                _itemInHandInfo.rigidbody.AddRelativeForce(_throwForce);
-            }
-        }
+    private void ThrowItem()
+    {
+        DropItem();
+        
+        _itemInHandInfo.rigidbody.AddRelativeForce(_throwForce);
     }
 }
