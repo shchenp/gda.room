@@ -7,8 +7,14 @@ public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private LayerMask _doorLayer;
     [SerializeField] private LayerMask _interactableLayer;
+    [SerializeField] private Transform _playerHand;
+    [SerializeField] private Transform _interactableInventory;
+    
     private Camera _camera;
-
+    private RaycastHit _itemInHandInfo;
+    private InteractableItem _item;
+    private bool _isItemInHand;
+    
     private void Awake()
     {
         _camera = Camera.main;
@@ -18,13 +24,55 @@ public class PlayerInteraction : MonoBehaviour
     {
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out var hitInfo, 2f, _doorLayer))
+        if (Physics.Raycast(ray, out var doorInfo, 2f, _doorLayer))
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                var door = hitInfo.collider.GetComponent<Door>();
+                var door = doorInfo.collider.GetComponent<Door>();
                 door.SwitchDoorState();
             }
+        }
+        
+        if (Physics.Raycast(ray, out var hitInfo, 2f, _interactableLayer))
+        {
+            _item = hitInfo.collider.GetComponent<InteractableItem>();
+            _item.SetFocus();
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                TakeItemInHand(hitInfo);
+            }
+        }
+        else
+        {
+            if (_item != null)
+            {
+                _item.RemoveFocus();
+                _item = null;
+            }
+        }
+    }
+
+    private void TakeItemInHand(RaycastHit hitInfo)
+    {
+        DropItem();
+        _isItemInHand = true;
+        _itemInHandInfo = hitInfo;
+        
+        var rigidbody = _itemInHandInfo.rigidbody;
+        rigidbody.isKinematic = true;
+                
+        var itemInHand = _itemInHandInfo.transform;
+        itemInHand.SetParent(_playerHand);
+        itemInHand.SetPositionAndRotation(_playerHand.position, _playerHand.rotation);
+    }
+
+    private void DropItem()
+    {
+        if (_isItemInHand)
+        {
+            _itemInHandInfo.rigidbody.isKinematic = false;
+            _itemInHandInfo.transform.SetParent(_interactableInventory, true);
         }
     }
 }
